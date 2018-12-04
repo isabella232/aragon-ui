@@ -13,13 +13,14 @@ const formatUnit = v => String(v).padStart(2, '0')
 
 class Countdown extends React.Component {
   static propTypes = {
+    start: PropTypes.instanceOf(Date),
     end: PropTypes.instanceOf(Date),
     removeDaysAndHours: PropTypes.bool,
   }
   render() {
-    const { end } = this.props
+    const { end, start } = this.props
     return (
-      <Main dateTime={formatHtmlDatetime(end)}>
+      <Main dateTime={formatHtmlDatetime(end || start)}>
         <IconWrapper>
           <IconTime />
         </IconWrapper>
@@ -28,12 +29,11 @@ class Countdown extends React.Component {
     )
   }
   renderTime = () => {
-    const { end, removeDaysAndHours } = this.props
-    const { days, hours, minutes, seconds, totalInSeconds } = difference(
-      end,
-      new Date()
-    )
-    if (totalInSeconds <= 0) {
+    const { start, end, removeDaysAndHours } = this.props
+    const diffArgs = (end) ? [ end, new Date() ] : [ new Date(), start ]
+    const { days, hours, minutes, seconds, totalInSeconds } = difference(...diffArgs)
+
+    if (end && totalInSeconds <= 0) {
       return <TimeOut>Time out</TimeOut>
     }
     return (
